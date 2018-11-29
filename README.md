@@ -1,6 +1,6 @@
 # Mobile Robots Autonomous Navigation
 
-Implemented Dubins Curves and RRT(Rapidly Exploring Random Trees)
+Implemented Dubins Curves and RRT(Rapidly Exploring Random Trees) along with the Optimal RRT version.
 
 Simulated an environment with obstacles with a Pioneer P3DX robot in Gazebo using ROS and applied these path planning algorithms.
 
