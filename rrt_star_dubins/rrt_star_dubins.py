@@ -20,8 +20,13 @@ plt.axis([-0.1, 1.1, -0.1, 1.1])
 obs = plt.Circle((0.3, 0.3), radius=0.1, fc='r')
 plt.gca().add_patch(obs)
 
-obs = plt.Circle((0.6, 0.5), radius=0.1, fc='r')
+obs = plt.Circle((0.6, 0.5), radius=0.2, fc='r')
 plt.gca().add_patch(obs)
+
+obs = plt.Circle((0.3, 0.5), radius=0.1, fc='r')
+plt.gca().add_patch(obs)
+
+obstacles = [(0.3,0.3,0.1),(0.6,0.5,0.2),(0.3,0.5,0.1)]
 
 rectangle = plt.Rectangle((0, 0), 1, 1,fill=False)
 plt.gca().add_patch(rectangle)
@@ -33,7 +38,7 @@ current_th=0		#current angle in Degrees
 
 PI=3.14
 r_min=0.02
-step=0.1
+step=0.3
 
 goal_x=0.8
 goal_y=0.8
@@ -218,6 +223,12 @@ def RSL(current_x,current_y,current_th,goal_x,goal_y,goal_th):
 
 tree = [Node(current_x,current_y)]
 
+def check_for_obstacles(x,y):
+	for ox,oy,orad in obstacles:
+		if ((x-ox)**2 + (y-oy)**2)**0.5 < orad*2:
+			return False
+	return True
+
 def findNearest(sample):
 	min_d = sys.maxint
 	ind=0
@@ -243,9 +254,7 @@ def check_collision_extend(node, theta, d):
 	for i in range(int(d / step)):
 		temp_node.x += step * math.cos(theta)
 		temp_node.y += step * math.sin(theta)
-		if ((temp_node.x-0.3)**2 + (temp_node.y-0.3)**2)**0.5 < 0.12:
-			return False
-		if ((temp_node.x-0.6)**2 + (temp_node.y-0.5)**2)**0.5 < 0.12:
+		if not check_for_obstacles(temp_node.x,temp_node.y):
 			return False
 		if temp_node.x>1 or temp_node.y>1 or temp_node.x<0 or temp_node.y<0:
 			return False
@@ -299,19 +308,24 @@ def RRT():
 		newNode.p=ind
 		newNode.cost+=step
 		# plt.plot(newNode.x,newNode.y,'r+')
-		# plt.pause(2)
 		# plt.plot(nearestNode.x,nearestNode.y,'bo')
 		# plt.pause(2)
 		# plt.plot(nearestNode.x,nearestNode.y,'wo')
 		# plt.pause(2)
 
-		if ((newNode.x-0.3)**2 + (newNode.y-0.3)**2)**0.5 < 0.12:
-			# plt.plot(newNode.x,newNode.y,'w+')
-			# plt.pause(2)
-			continue
-		if ((newNode.x-0.6)**2 + (newNode.y-0.5)**2)**0.5 < 0.12:
-			# plt.plot(newNode.x,newNode.y,'w+')
-			# plt.pause(2)
+		# if ((newNode.x-0.3)**2 + (newNode.y-0.3)**2)**0.5 < 0.2:
+		# 	# plt.plot(newNode.x,newNode.y,'w+')
+		# 	# plt.pause(2)
+		# 	continue
+		# if ((newNode.x-0.6)**2 + (newNode.y-0.5)**2)**0.5 < 0.2:
+		# 	# plt.plot(newNode.x,newNode.y,'w+')
+		# 	# plt.pause(2)
+		# 	continue
+		# if ((newNode.x-0.3)**2 + (newNode.y-0.5)**2)**0.5 < 0.2:
+		# 	# plt.plot(newNode.x,newNode.y,'w+')
+		# 	# plt.pause(2)
+		# 	continue
+		if not check_for_obstacles(newNode.x,newNode.y):
 			continue
 		if newNode.x>1 or newNode.y>1 or newNode.x<0 or newNode.y<0:
 			# plt.plot(newNode.x,newNode.y,'w+')
@@ -326,7 +340,7 @@ def RRT():
 		tree.append(newNode)
 		rewire(newNode,nearbyNodes)
 
-		if ((newNode.x-goal_x)**2 + (newNode.y-goal_y)**2)**0.5 < step:
+		if ((newNode.x-goal_x)**2 + (newNode.y-goal_y)**2)**0.5 < 0.1:
 			break
 		# DrawGraph(sample)
 	path=[[newNode.x,newNode.y]]
